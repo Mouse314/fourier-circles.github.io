@@ -21,7 +21,7 @@ var ctx = canv.getContext("2d");
 
 //Inner graphics parameters
 canv.width = window.innerWidth;
-canv.height = window.innerHeight - 110;
+canv.height = window.innerHeight - 220;
 ctx.strokeStyle = "white";
 ctx.lineWidth = 0.5;
 var offset = [canv.width / 2, canv.height / 2];
@@ -239,13 +239,7 @@ canv.addEventListener("mouseup", function(e){
     IsMouseDown = false;
 });
 
-canv.addEventListener("touchstart", function(e){
-    IsMouseDown = true;
-});
 
-canv.addEventListener("touchend", function(e){
-    IsMouseDown = false;
-});
 
 canv.addEventListener("mousemove", function(e){
     if(IsDrawingMode && IsMouseDown){
@@ -255,7 +249,7 @@ canv.addEventListener("mousemove", function(e){
         ctx.beginPath();
         ctx.moveTo(e.x, e.y);
     }
-
+    
     if(!IsDrawingMode && IsMouseDown){
         mousepos = [mousepos[0] - e.x, mousepos[1] - e.y];
         offset[0] -= mousepos[0];
@@ -268,23 +262,27 @@ canv.addEventListener("mousemove", function(e){
 });
 
 canv.addEventListener("touchmove", function(e){
-    if(IsDrawingMode && IsMouseDown){
-        draw_pic.push([e.x, e.y]);
-        ctx.lineTo(e.x, e.y);
+    let _x = e.changedTouches[0].pageX;
+    let _y = e.changedTouches[0].pageY;
+
+    if(IsDrawingMode){
+        draw_pic.push([_x, _y]);
+        ctx.lineTo(_x, _y);
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(e.x, e.y);
+        ctx.moveTo(_x, _y);
     }
-
-    if(!IsDrawingMode && IsMouseDown){
-        mousepos = [mousepos[0] - e.x, mousepos[1] - e.y];
+    
+    if(!IsDrawingMode){
+        mousepos = [mousepos[0] - _x, mousepos[1] - _y];
         offset[0] -= mousepos[0];
         offset[1] -= mousepos[1];
         picture = PicOffset(picture, mousepos);
         line_track = PicOffset(line_track, mousepos);
         i_line = PicOffset(i_line, mousepos);
     }
-    mousepos = [e.x, e.y];
+    mousepos = [_x, _y];
+    console.log(mousepos);
 });
 
 function setDrawing(){

@@ -72,9 +72,12 @@ for(var i = 0; i < picture.length; i++){
 circlesDraw(f_p);
 
 var i_line = Instant_Calc();
+var saved_width = window.innerWidth;
 
 window.addEventListener("resize", (e) => {
+    if(window.innerWidth == saved_width) return;
     location.reload()
+    saved_width = window.innerWidth;
 });
 
 window.addEventListener("keydown", (e) => {

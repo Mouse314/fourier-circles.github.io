@@ -276,11 +276,33 @@ canv.addEventListener("mousemove", function(e){
     mousepos = [e.x, e.y];
 });
 
+
+//Mobile Touches
+
+let initialDistance = null;
+let scale_m = 1;
+    
+function getDistance(touch1, touch2) {
+    const dx = touch1.pageX - touch2.pageX;
+    const dy = touch1.pageY - touch2.pageY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 canv.addEventListener("touchstart", function(e){
+    let _x = e.changedTouches[0].pageX;
+    let _y = e.changedTouches[0].pageY;
+    mousepos = [_x, _y];
     body.style.overflow = "hidden";
+    if (e.touches.length === 2) {
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+    }
 });
+
 canv.addEventListener("touchend", function(e){
     body.style.overflow = "auto";
+    if (e.touches.length < 2) {
+        initialDistance = null; 
+    }
 });
 
 canv.addEventListener("touchmove", function(e){
@@ -306,8 +328,32 @@ canv.addEventListener("touchmove", function(e){
         i_line = PicOffset(i_line, mousepos);
     }
     mousepos = [_x, _y];
-    console.log(mousepos);
+
+    //Zoom
+    if (e.touches.length === 2) {
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        if (initialDistance) {
+            const scaleChange = currentDistance / initialDistance;
+            scale_m *= scaleChange;
+            scale_m = Math.max(0.1, Math.min(100, scale));
+            ZoomEl.value = `${scale_m}`
+            initialDistance = currentDistance; 
+        }
+    }
 });
+
+
+//Mouse wheel
+canv.addEventListener('wheel', function(e){
+    let delta = e.deltaY;
+    if (delta > 0) {
+        ZoomEl.value = String(Number.parseFloat(ZoomEl.value) - 1);
+    }
+    else {
+        ZoomEl.value = String(Number.parseFloat(ZoomEl.value) + 1);
+    }
+});
+
 
 function setDrawing(){
     IsDrawingMode = true;
